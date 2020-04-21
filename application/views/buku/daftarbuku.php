@@ -21,3 +21,13 @@
 			 	 	 	 	 } 
 			 	 	 	 	 ?> 
 			 	 	 	 	 <a class="btn btn-outline-warning fas fw fa-search" href="<?= base_url('home/detailBuku/' . $buku->id); ?>"> Detail</a></p>
+
+			 	 	 	 	  </div>                      
+			 	 	 	 	</div> 
+			 	 	 	 </div> <?php } ?>                        
+			 	 	 	  <!-- end looping --> 
+			 	 	  </div> 
+ 
+                  </div>
+               </div>      
+           </div>   
