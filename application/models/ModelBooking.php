@@ -32,7 +32,7 @@ class ModelBooking extends CI_Model
  
     public function simpanDetail($where = null)     
     {         
-    	$sql = "INSERT INTO booking_detail (id_booking,id_buku) SELECT booking.id _booking,temp.id_buku FROM booking, temp WHERE temp.id_user=booking.id_user AND b ooking.id_user='$where'";         
+    	$sql = "INSERT INTO booking_detail (id_booking,id_buku) SELECT booking.id_booking,temp.id_buku FROM booking, temp WHERE temp.id_user=booking.id_user AND booking.id_user='$where'";         
     	$this->db->query($sql);     
     } 
  
@@ -64,14 +64,14 @@ class ModelBooking extends CI_Model
  
     public function createTemp()     
     {         
-    	$this->db>query('CREATE TABLE IF NOT EXISTS temp(id_booking varchar(12), tgl_booking DATET IME, email_user varchar(128), id_buku int)');     
+    	$this->db->query('CREATE TABLE IF NOT EXISTS temp(id_booking varchar(12), tgl_booking DATETIME, email_user varchar(128), id_buku int)');     
     } 
  
     public function selectJoin()     
     {         
     	$this->db->select('*');         
     	$this->db->from('booking');         
-    	$this->db>join('booking_detail', 'booking_detail.id_booking=booking.id_booking');         
+    	$this->db->join('booking_detail', 'booking_detail.id_booking=booking.id_booking');         
     	$this->db->join('buku', 'booking_detail.id_buku=buku.id');         return $this->db->get();     
     } 
  

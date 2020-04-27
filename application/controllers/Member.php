@@ -51,20 +51,20 @@ class Member extends CI_Controller
     {         
     	$this->form_validation->set_rules('nama', 'Nama Lengkap', 'required', [             
     		'required' => 'Nama Belum diis!!'         ]);         
-    	$this->form_validation>set_rules('alamat', 'Alamat Lengkap', 'required', [             
+    	$this->form_validation->set_rules('alamat', 'Alamat Lengkap', 'required', [             
     		'required' => 'Alamat Belum diis!!'         
     	]);
 
-    	 $this->form_validation>set_rules('email', 'Alamat Email', 'required|trim|valid_email|is_unique[user.ema il]', [             
+    	 $this->form_validation->set_rules('email', 'Alamat Email', 'required|trim|valid_email|is_unique[user.ema il]', [             
     	 	'valid_email' => 'Email Tidak Benar!!',             
     	 	'required' => 'Email Belum diisi!!',             
     	 	'is_unique' => 'Email Sudah Terdaftar!'         
     	 ]);         
-    	 $this->form_validation>set_rules('password1', 'Password', 'required|trim|min_length[3]|matches[password 2]', [             
+    	 $this->form_validation->set_rules('password1', 'Password', 'required|trim|min_length[3]|matches[password 2]', [             
     	 	'matches' => 'Password Tidak Sama!!',             
     	 	'min_length' => 'Password Terlalu Pendek'         
     	 ]);         
-    	 $this->form_validation>set_rules('password2', 'Repeat Password', 'required|trim|matches[password1]'); 
+    	 $this->form_validation->set_rules('password2', 'Repeat Password', 'required|trim|matches[password1]'); 
  
         $email = $this->input->post('email', true);         
         $data = [             
@@ -72,7 +72,7 @@ class Member extends CI_Controller
         	'alamat' => $this->input->post('alamat', true),             
         	'email' => htmlspecialchars($email),             
         	'image' => 'default.jpg',             
-        	'password' => password_hash($this->input>post('password1'), PASSWORD_DEFAULT),             'role_id' => 2,             
+        	'password' => password_hash($this->input->post('password1'), PASSWORD_DEFAULT),             'role_id' => 2,             
         	'is_active' => 1,             
         	'tanggal_input' => time()         
         ];         
@@ -160,4 +160,5 @@ public function logout()
  
         
         $this->session->set_flashdata('pesan', '<div class="alert alertsuccess alert-message" role="alert">Anda telah logout!!</div>');         redirect('home');     
-    } 
+    }
+}

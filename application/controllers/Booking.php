@@ -15,7 +15,7 @@ class Booking extends CI_Controller
     	$id_user = $this->session->userdata('id_user');         
     	$data['booking'] = $this->ModelBooking->joinOrder($id)->result(); 
  
-        $user = $this->ModelUser->cekData(['email' => $this->session>userdata('email')])->row_array();         
+        $user = $this->ModelUser->cekData(['email' => $this->session->userdata('email')])->row_array();         
         foreach ($user as $a) {             
         	$data = [                 
         		'image' => $user['image'],                 
@@ -24,13 +24,13 @@ class Booking extends CI_Controller
         		'tanggal_input' => $user['tanggal_input']             
         	];         
         	}         
-        	$dtb = $this->ModelBooking->showtemp(['id_user' => $id_user])>num_rows(); 
+        	$dtb = $this->ModelBooking->showtemp(['id_user' => $id_user])->num_rows(); 
  
         if ($dtb < 1) {             
         	$this->session->set_flashdata('pesan', '<div class="alert alertmassege alert-danger" role="alert">Tidak Ada Buku dikeranjang</div>');
         	             redirect(base_url());         
         	         } else {             
-        	         	$data['temp'] = $this->db>query("select image, judul_buku, penulis, penerbit, tahun_terbit,id_buku from te mp where id_user='$id_user'")->result_array();         
+        	         	$data['temp'] = $this->db->query("select image, judul_buku, penulis, penerbit, tahun_terbit,id_buku from temp where id_user='$id_user'")->result_array();         
         	         }         
         	         $data['judul'] = "Data Booking"; 
  
@@ -64,15 +64,15 @@ class Booking extends CI_Controller
  
         //cek apakah buku yang di klik booking sudah ada di keranjang 
 
-	  $temp = $this->ModelBooking>getDataWhere('temp', ['id_buku' => $id_buku])->num_rows(); 
+	  $temp = $this->ModelBooking->getDataWhere('temp', ['id_buku' => $id_buku])->num_rows(); 
  
         $userid = $this->session->userdata('id_user'); 
  
         //cek jika sudah memasukan 3 buku untuk dibooking dalam keranjang         
-        $tempuser = $this->db>query("select*from temp where id_user ='$userid'")->num_rows(); 
+        $tempuser = $this->db->query("select*from temp where id_user ='$userid'")->num_rows(); 
  
         //cek jika masih ada booking buku yang belum diambil         
-        $databooking = $this->db>query("select*from booking where id_user='$userid'")->num_rows();         
+        $databooking = $this->db->query("select*from booking where id_user='$userid'")->num_rows();         
         if ($databooking > 0) {             
         	$this->session->set_flashdata('pesan', '<div class="alert alertdanger alertmessage" role="alert">Masih Ada booking buku sebelumnya yang belum diambil.<br> A bmil Buku yang dibooking atau tunggu 1x24 Jam untuk bisa booking kembali </div>') ;             
         	redirect(base_url());         
@@ -118,12 +118,12 @@ class Booking extends CI_Controller
  public function bookingSelesai($where)     
  {         
  //mengupdate stok dan dibooking di tabel buku saat proses booking diseles aikan         
- 	$this->db>query("UPDATE buku, temp SET buku.dibooking=buku.dibooking+1, buku.stok=buku.sto k-1 WHERE buku.id=temp.id_buku"); 
+ 	$this->db->query("UPDATE buku, temp SET buku.dibooking=buku.dibooking+1, buku.stok=buku.stok-1 WHERE buku.id=temp.id_buku"); 
  
         
         $tglsekarang = date('Y-m-d');         
         $isibooking = [             
-        	'id_booking' => $this->ModelBooking>kodeOtomatis('booking', 'id_booking'),             
+        	'id_booking' => $this->ModelBooking->kodeOtomatis('booking', 'id_booking'),             
         	'tgl_booking' => date('Y-m-d H:m:s'),             
         	'batas_ambil' => date('Y-md', strtotime('+2 days', strtotime($tglsekarang))),             
         	'id_user' => $where         
@@ -144,11 +144,33 @@ public function info()
 	$where = $this->session->userdata('id_user');         
 	$data['user'] = $this->session->userdata('nama');         
 	$data['judul'] = "Selesai Booking";         
-	$data['useraktif'] = $this->ModelUser->cekData(['id' => $this->session>userdata('id_user')])->result();         
-	$data['items'] = $this->db>query("select*from booking bo, booking_detail d, buku bu where d.id_booking=bo.i d_booking and d.id_buku=bu.id and bo.id_user='$where'")->result_array(); 
+	$data['useraktif'] = $this->ModelUser->cekData(['id' => $this->session->userdata('id_user')])->result();         
+	$data['items'] = $this->db->query("select*from booking bo, booking_detail d, buku bu where d.id_booking=bo.i d_booking and d.id_buku=bu.id and bo.id_user='$where'")->result_array(); 
 	   $this->load->view('templates/templates-user/header', $data);         
 	   $this->load->view('booking/info-booking', $data);         
 	   $this->load->view('templates/templates-user/modal');         
 	   $this->load->view('templates/templates-user/footer');     
 	} 
- 
+ }
+
+
+ public function exportToPdf()     
+ {         
+ $id_user = $this->session->userdata('id_user');         
+ $data['user'] = $this->session->userdata('nama');         
+ $data['judul'] = "Cetak Bukti Booking";         
+ $data['useraktif'] = $this->ModelUser->cekData(['id' => $this->session->userdata('id_user')])->result();         
+ $data['items'] = $this->db->query("select*from booking bo, booking_detail d, buku bu where d.id_booking=bo.i d_booking and d.id_buku=bu.id and bo.id_user='$id_user'")->result_array();                  
+ $this->load->library('dompdf_gen');                   
+ $this->load->view('booking/bukti-pdf', $data);              
+ $paper_size  = 'A4'; 
+ // ukuran kertas         
+ $orientation = 'landscape'; //tipe format kertas potrait atau landscape         
+ $html = $this->output->get_output();              
+ $this->dompdf->set_paper($paper_size, $orientation);         
+ //Convert to PDF         
+ $this->dompdf->load_html($html);         
+ $this->dompdf->render();         
+ $this->dompdf->stream("bukti-booking$id_user.pdf", array('Attachment' => 0));         
+ // nama file pdf yang di hasilkan     
+}
